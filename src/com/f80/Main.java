@@ -1,47 +1,27 @@
 package com.f80;
 
-import com.google.cloud.texttospeech.v1.*;
-import com.google.protobuf.ByteString;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import com.ibm.watson.developer_cloud.service.security.IamOptions;
+import com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech;
+import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voices;
+
+import java.io.*;
+import java.util.Collections;
 
 public class Main {
 
+    
     public static void main(String[] args) {
 
         String s="Bonjour comment allez vous";
-        try (TextToSpeechClient textToSpeechClient = TextToSpeechClient.create()) {
-            // Set the text input to be synthesized
-            SynthesisInput input = SynthesisInput.newBuilder()
-                    .setText("Hello, World!")
-                    .build();
+        IamOptions options = new IamOptions.Builder()
+                .apiKey("Q80Er-EUKVmGwj6TtGBoQA-x9-Cn3-1aK6Ayt8CtoH6p")
+                .build();
 
-            // Build the voice request, select the language code ("en-US") and the ssml voice gender
-            // ("neutral")
-            VoiceSelectionParams voice = VoiceSelectionParams.newBuilder()
-                    .setLanguageCode("en-US")
-                    .setSsmlGender(SsmlVoiceGender.NEUTRAL)
-                    .build();
+        TextToSpeech textToSpeech = new TextToSpeech(options);
 
-            // Select the type of audio file you want returned
-            AudioConfig audioConfig = AudioConfig.newBuilder()
-                    .setAudioEncoding(AudioEncoding.MP3)
-                    .build();
+        textToSpeech.setEndPoint("https://stream-fra.watsonplatform.net/text-to-speech/api");
 
-            // Perform the text-to-speech request on the text input with the selected voice parameters and
-            // audio file type
-            SynthesizeSpeechResponse response = textToSpeechClient.synthesizeSpeech(input, voice,
-                    audioConfig);
-
-            // Get the audio contents from the response
-            ByteString audioContents = response.getAudioContent();
-
-            // Write the response to the output file.
-            try (OutputStream out = new FileOutputStream("output.mp3")) {
-                out.write(audioContents.toByteArray());
-                System.out.println("Audio content written to file \"output.mp3\"");
-            }
-        }
-    }
+        Voices voices = textToSpeech.listVoices().execute();
+        System.out.println(voices);
     }
 }
